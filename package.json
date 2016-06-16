@@ -1,0 +1,14 @@
+{
+  "name": "bam-viewer",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "scripts": {
+    "build": "./build.sh"
+  },
+  "devDependencies": {
+    "vulcanize": "1.14.8"
+  }
+}
