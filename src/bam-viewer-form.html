@@ -1,0 +1,165 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/jsorolla/src/lib/components/jso-genome-viewer-element.html">
+<script src="../bower_components/jsorolla/src/genome-viewer/renderers/bam-renderer.js"></script>
+<dom-module id="bam-viewer-form">
+    <style>
+        :host {
+            display: block;
+            position: relative;
+            box-sizing: border-box;
+            word-break: break-all;
+            cursor: pointer;
+            background-color: var(--light-secondary-color);
+            @apply(--layout-horizontal);
+            overflow-y: scroll;
+        }
+
+        #right,
+        #left {
+            position: relative;
+            box-sizing: border-box;
+            padding: 10px;
+        }
+
+        #right {
+            @apply(--layout-flex);
+        }
+
+        .list {
+            position: relative;
+            box-sizing: border-box;
+            overflow-y: auto;
+            border: 1px solid var(--divider-color);
+            background-color: var(--light-primary-color);
+            height: calc(100% - 25px);
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+            padding: 3px;
+        }
+
+        .list > div {
+            cursor: pointer;
+            padding: 1px 4px;
+            border: 1px solid transparent;
+        }
+
+        .list > div:hover {
+            background-color: var(--hover-color);
+            border-color: var(--accent-color);
+        }
+
+        .file[data-notindex] {
+            color: #888 !important;
+        }
+
+        jso-genome-viewer-element {
+            /*box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.2);*/
+            /*overflow-y: scroll;*/
+            border: 1px solid var(--divider-color);
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+    <template>
+        <div id="left">
+            <label class="stv">BAM files list:</label>
+            <div class="list">
+                <template is="dom-repeat" items="{{files}}">
+                    <div on-click="handleFileClick" class="file" data-notindex$="{{!item.hasIndex}}">
+                        <i hidden$="{{!item.hasIndex}}" class="fa fa-file-o"></i>
+                        <i title="Index (.bai) file not found, please create it on the server folder." hidden$="{{item.hasIndex}}" class="fa fa-warning" style="color:goldenrod;"></i>
+                        <span data-haschanged$="{{item.haschanged}}">{{item.name}}</span>
+                    </div>
+                </template>
+            </div>
+        </div>
+        <div id="right">
+            <label class="stv">Genome viewer:</label>
+            <jso-genome-viewer-element id="gv"></jso-genome-viewer-element>
+        </div>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'bam-viewer-form',
+        properties: {
+            files: {
+                type: Array
+            }
+        },
+        ready: function() {
+            var me = this;
+            this.getBamFiles();
+            setInterval(function() {
+                me.getBamFiles();
+            }, 5000);
+
+            this.async(function() {
+                this.$.gv.createGenomeViewer();
+                this.genomeViewer = this.$.gv.genomeViewer;
+                this.genomeViewer.draw();
+            }, 200);
+        },
+        getBamFiles: function() {
+            var me = this;
+            var request = new XMLHttpRequest();
+            request.onload = function() {
+                me.files = JSON.parse(this.response);
+            };
+            request.onerror = function() {
+                console.log('Server error');
+            };
+            var url = BAM_SERVER_HOST + "/list";
+            request.open('GET', url, true);
+            request.send();
+        },
+        handleFileClick: function(e) {
+            // /*CIGAR contains I*/
+            // var region = new Region({
+            //     chromosome: "20",
+            //     start: 32861008,
+            //     end: 32861008
+            // });
+            //
+            // /*CIGAR contains D*/
+            // var region = new Region({
+            //     chromosome: "20",
+            //     start: 32861242,
+            //     end: 32861242
+            // });
+            var file = e.model.item;
+
+            if (file.hasIndex == true && this.genomeViewer._checkChangingRegion()) {
+                var t = new AlignmentTrack({
+                    title: file.name,
+                    closable: true,
+                    visibleRegionSize: 120000,
+                    minHistogramRegionSize: 150000,
+                    maxLabelRegionSize: 3000,
+                    height: 280,
+
+                    renderer: new BamRenderer(),
+
+                    dataAdapter: new FeatureTemplateAdapter({
+                        multiRegions: true,
+                        histogramMultiRegions: false,
+                        uriTemplate: BAM_SERVER_HOST + '/?region={region}&fileName=' + file.name,
+                        cacheConfig: {
+                            chunkSize: 10000
+                        },
+                        parse: function(response) {
+                            return response.results;
+                        }
+                    })
+                });
+
+                try {
+                    var region = new Region(file.firstReadPos);
+                    this.genomeViewer.setRegion(new Region(file.firstReadPos));
+                } catch (e) {
+                    console.log('Could not get first read region from file.');
+                }
+                this.genomeViewer.addTrack(t);
+            }
+        }
+    });
+</script>

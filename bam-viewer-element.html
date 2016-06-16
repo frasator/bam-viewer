@@ -10,6 +10,8 @@
 <link rel="import" href="bower_components/stevia-elements/src/stv-tooltip.html">
 <link rel="import" href="bower_components/stevia-elements/src/dropdown/stv-dropdown.html">
 
+<link rel="import" href="src/bam-viewer-form.html">
+
 <dom-module id="bam-viewer-element">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning"></style>
     <style>
@@ -41,10 +43,6 @@
             /*background-color: transparent;*/
         }
 
-        #fileBrowser {}
-
-        #jobBrowser {}
-
         @media (max-width: 1100px) {
             .option-text {
                 display: none;
@@ -61,27 +59,16 @@
             font-weight: normal;
         }
 
-        pathact-home {
-            height: calc(100vh - 160px);
-            overflow-y: auto;
-        }
-
-        pathact-viewer {
+        bam-viewer-form {
             height: calc(100vh - 60px);
-            overflow-y: auto;
-        }
-
-        pathact-form {
-            height: calc(100vh - 60px);
-            overflow-y: auto;
         }
     </style>
     <template>
         <div class="content" menu-option="home">
-
+            <bam-viewer-form id="asdf"></bam-viewer-form>
         </div>
 
-        <stv-header id="stvHeader" hide-jobs hide-browse  hide-login hide-signup selected-option="{{selectedOption}}" user-data="{{userData}}">
+        <stv-header id="stvHeader" hide-jobs hide-browse hide-login hide-signup selected-option="{{selectedOption}}" user-data="{{userData}}">
             <!-- <div class="icon">
                 <img src="images/icon.svg" style="height: 54px;margin: 8px 3px 0 0;">
             </div> -->
@@ -114,13 +101,13 @@
             </stv-dropdown>
         </stv-header>
 
-        <stv-footer menu-option="home,login,signup,profile,remember">
+        <!-- <stv-footer menu-option="home,login,signup,profile,remember">
             Bam Viewer {{version}}
             <br> Created by
             <span style="font-weight:bold;">Computational Genomics Department</span>
             <br> Principe Felipe Research Center, Valencia, Spain
             <br> 2016
-        </stv-footer>
+        </stv-footer> -->
     </template>
 
     <script>
@@ -130,20 +117,7 @@
             properties: {
 
             },
-            ready: function() {
-            },
-            _asdf: function(filepath, cb) {
-                var me = this;
-                var request = new XMLHttpRequest();
-                request.onload = function() {
-                    cb(this.responseText);
-                };
-                request.onerror = function() {
-                    console.log('Error loading remote file');
-                };
-                request.open("GET", filepath);
-                request.send();
-            }
+            ready: function() {},
         });
     </script>
 </dom-module>
