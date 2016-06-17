@@ -18,6 +18,16 @@ cp -r bower_components/fontawesome/css $BP/fontawesome/
 cp -r bower_components/fontawesome/fonts $BP/fontawesome/
 cp -r bower_components/webcomponentsjs/*.min.js $BP/webcomponentsjs/
 
+# GV deps
+cp -r bower_components/underscore $BP/
+cp -r bower_components/backbone $BP/
+cp -r bower_components/jquery $BP/
+cp -r bower_components/qtip2 $BP/
+cp -r bower_components/uri.js $BP/
+cp -r bower_components/uri.js $BP/
+mkdir -p $BP/bower_components/jsorolla
+cp -r bower_components/jsorolla/styles $BP/bower_components/jsorolla
+
 #
 # fix index.html css paths
 #

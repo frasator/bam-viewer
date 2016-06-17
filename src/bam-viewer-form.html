@@ -8,8 +8,6 @@
             display: block;
             position: relative;
             box-sizing: border-box;
-            word-break: break-all;
-            cursor: pointer;
             background-color: var(--light-secondary-color);
             @apply(--layout-horizontal);
             overflow-y: scroll;
@@ -20,10 +18,12 @@
             position: relative;
             box-sizing: border-box;
             padding: 10px;
+            width: 300px;
         }
 
         #right {
             @apply(--layout-flex);
+            padding-left: 0;
         }
 
         .list {
@@ -41,6 +41,7 @@
             cursor: pointer;
             padding: 1px 4px;
             border: 1px solid transparent;
+            word-break: break-all;
         }
 
         .list > div:hover {
@@ -84,6 +85,9 @@
         properties: {
             files: {
                 type: Array
+            },
+            lastFile: {
+                type: Object
             }
         },
         ready: function() {
@@ -97,6 +101,8 @@
                 this.$.gv.createGenomeViewer();
                 this.genomeViewer = this.$.gv.genomeViewer;
                 this.genomeViewer.draw();
+
+                this.genomeViewer.toggleAutoHeight(true);
             }, 200);
         },
         getBamFiles: function() {
@@ -113,6 +119,7 @@
             request.send();
         },
         handleFileClick: function(e) {
+            var me = this;
             // /*CIGAR contains I*/
             // var region = new Region({
             //     chromosome: "20",
@@ -128,37 +135,44 @@
             // });
             var file = e.model.item;
 
-            if (file.hasIndex == true && this.genomeViewer._checkChangingRegion()) {
-                var t = new AlignmentTrack({
-                    title: file.name,
-                    closable: true,
-                    visibleRegionSize: 120000,
-                    minHistogramRegionSize: 150000,
-                    maxLabelRegionSize: 3000,
-                    height: 280,
+            var fileRegion = new Region(file.firstReadPos);
+            fileRegion.start = fileRegion.start - 1000;
+            fileRegion.end = fileRegion.end + 1000;
 
-                    renderer: new BamRenderer(),
+            if (file.hasIndex == true && this.genomeViewer._checkChangingRegion() && me.lastFile != file.name) {
+                this.lastFile = file.name;
 
-                    dataAdapter: new FeatureTemplateAdapter({
-                        multiRegions: true,
-                        histogramMultiRegions: false,
-                        uriTemplate: BAM_SERVER_HOST + '/?region={region}&fileName=' + file.name,
-                        cacheConfig: {
-                            chunkSize: 10000
-                        },
-                        parse: function(response) {
-                            return response.results;
-                        }
-                    })
+                this.genomeViewer.once('region:change', function(event) {
+                    if (me.genomeViewer.region.equals(event.region) && !me.genomeViewer.containsTrackById(file.name)) {
+
+                        var t = new AlignmentTrack({
+                            id: file.name,
+                            title: file.name,
+                            closable: true,
+                            visibleRegionSize: 120000,
+                            minHistogramRegionSize: 150000,
+                            maxLabelRegionSize: 3000,
+                            height: 280,
+
+                            renderer: new BamRenderer(),
+
+                            dataAdapter: new FeatureTemplateAdapter({
+                                multiRegions: true,
+                                histogramMultiRegions: false,
+                                uriTemplate: BAM_SERVER_HOST + '/?region={region}&fileName=' + file.name,
+                                cacheConfig: {
+                                    chunkSize: 10000
+                                },
+                                parse: function(response) {
+                                    return response.results;
+                                }
+                            })
+                        });
+                        me.genomeViewer.addTrack(t);
+                    }
                 });
+                this.genomeViewer.setRegion(fileRegion);
 
-                try {
-                    var region = new Region(file.firstReadPos);
-                    this.genomeViewer.setRegion(new Region(file.firstReadPos));
-                } catch (e) {
-                    console.log('Could not get first read region from file.');
-                }
-                this.genomeViewer.addTrack(t);
             }
         }
     });
