@@ -102,7 +102,7 @@
                 this.genomeViewer = this.$.gv.genomeViewer;
                 this.genomeViewer.draw();
 
-                this.genomeViewer.toggleAutoHeight(true);
+                // this.genomeViewer.toggleAutoHeight(true);
             }, 200);
         },
         getBamFiles: function() {
@@ -149,16 +149,17 @@
                             id: file.name,
                             title: file.name,
                             closable: true,
-                            visibleRegionSize: 120000,
-                            minHistogramRegionSize: 150000,
+                            // visibleRegionSize: 50000,
+                            minHistogramRegionSize: 12000,
                             maxLabelRegionSize: 3000,
-                            height: 280,
+                            histogramColor: '#92de47',
+                            height: 100,
 
                             renderer: new BamRenderer(),
 
                             dataAdapter: new FeatureTemplateAdapter({
                                 multiRegions: true,
-                                histogramMultiRegions: false,
+                                histogramMultiRegions: true,
                                 uriTemplate: BAM_SERVER_HOST + '/?region={region}&fileName=' + file.name,
                                 cacheConfig: {
                                     chunkSize: 10000
