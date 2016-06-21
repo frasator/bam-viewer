@@ -63,10 +63,12 @@
         <!-- <bam-viewer-element version="0.0.1"></bam-viewer-element> -->
         <script>
             var bamViewer;
-            getSpecies(function(s) {
-                AVAILABLE_SPECIES = s;
-                DEFAULT_SPECIES = AVAILABLE_SPECIES.vertebrates[0];
-                run();
+            window.addEventListener('WebComponentsReady', function(e) {
+                getSpecies(function(s) {
+                    AVAILABLE_SPECIES = s;
+                    DEFAULT_SPECIES = AVAILABLE_SPECIES.vertebrates[0];
+                    run();
+                });
             });
 
             function getSpecies(callback) {
