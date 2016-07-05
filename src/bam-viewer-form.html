@@ -92,18 +92,20 @@
         },
         ready: function() {
             var me = this;
-            this.getBamFiles();
-            setInterval(function() {
-                me.getBamFiles();
-            }, 5000);
 
             this.async(function() {
                 this.$.gv.createGenomeViewer();
                 this.genomeViewer = this.$.gv.genomeViewer;
                 this.genomeViewer.draw();
+                // this.$.gv.genomeViewer.toggleAutoHeight(true);
+            }, 10);
 
-                // this.genomeViewer.toggleAutoHeight(true);
-            }, 200);
+            this.async(function() {
+                this.getBamFiles();
+                setInterval(function() {
+                    me.getBamFiles();
+                }, 5000);
+            }, 20);
         },
         getBamFiles: function() {
             var me = this;
