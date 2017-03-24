@@ -1,18 +1,5 @@
 {
     "name": "bam-viewer",
-    "description": "",
-    "repository": {
-        "type": "git",
-        "url": ""
-    },
-    "main": [
-        "bam-viewer-index.html"
-    ],
-    "authors": [
-        "Francisco Salavert Torres <frasator@gmail.com>"
-    ],
-    "license": "GPL-3.0",
-    "keywords": [],
     "ignore": [
         "**/.*",
         "node_modules",
@@ -21,11 +8,7 @@
         "tests"
     ],
     "dependencies": {
-        "polymer": "Polymer/polymer#^1.5.0",
-        "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.3.1",
-        "iron-list": "^1.2.8",
-        "fontawesome": "*",
-        "stevia-elements": "https://github.com/babelomics/stevia-elements.git#develop",
+        "stevia-elements": "https://github.com/frasator/stevia-elements.git#master",
         "jsorolla": "https://github.com/opencb/jsorolla.git#develop"
     },
     "private": true
